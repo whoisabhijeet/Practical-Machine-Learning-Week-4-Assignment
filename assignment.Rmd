@@ -1,0 +1,79 @@
+---
+title: "Week 4 Assignment-Practical Machine Learning"
+author: "Abhijeet Sharma"
+date: "19/01/2021"
+---
+
+# ** Introduction **
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: [http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har] (see the section on the Weight Lifting Exercise Dataset).
+
+# ** Data Source **
+
+The training data for this project are available here:
+
+[https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv]
+
+The test data are available here:
+
+[https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv]
+
+The data for this project come from this source: [http://groupware.les.inf.puc-rio.br/har]. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+# ** 1. Loading the Dataset**
+
+The Dataset has been downloaded from the internet and has been loaded into two seperate dataframes, __“training__ and “testing”. The __“training__ data set has 19622 number of records and the __“testing__ data set has 20 records. The number of variables is 160.
+
+```{r}
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(RColorBrewer)
+library(RGtk2)
+library(rattle)
+library(randomForest)
+library(gbm)
+```
+Here are the datasets, loaded directly from web and then downloaded.
+```{r}
+train_url <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+test_url  <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+
+
+init_org_training_data <- read.csv(url(train_url))
+init_org_testing_data <- read.csv(url(test_url))
+
+dim(init_org_training_data)
+dim(init_org_testing_data)
+```
+# ** 2. Data Cleansing **
+
+There are 3 parts in Data Cleansing.
+
+## A. Removing Variables which are having nearly zero variance.
+
+```{r}
+non_zero_var <- nearZeroVar(init_org_training_data)
+
+
+org_training_data <- init_org_training_data[,-non_zero_var]
+org_testing_data <- init_org_testing_data[,-non_zero_var]
+
+dim(org_training_data)
+
+dim(org_testing_data)
+```
+
+## B. Removing Variables which are having NA values. Our threshhold is 95%.
+
+```{r}
+na_val_col <- sapply(org_training_data, function(x) mean(is.na(x))) > 0.95
+
+org_training_data <- org_training_data[,na_val_col == FALSE]
+org_testing_data <- org_testing_data[,na_val_col == FALSE]
+
+dim(org_training_data)
+
+dim(org_testing_data)
+```
+
